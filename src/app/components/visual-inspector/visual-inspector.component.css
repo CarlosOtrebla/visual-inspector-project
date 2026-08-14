@@ -1,0 +1,973 @@
+/* Estilos Vanilla CSS para portabilidade total do Visual Inspector em qualquer projeto */
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* Painel Principal */
+.vi-panel {
+  position: fixed;
+  z-index: 99999;
+  background-color: #0f172a; /* bg-slate-900 */
+  border: 1px solid #1e293b; /* border-slate-850 */
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  border-radius: 16px;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+  overflow: hidden;
+  transition: box-shadow 0.2s ease-in-out;
+}
+.vi-panel:hover {
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+}
+
+/* Cabeçalho */
+.vi-header {
+  padding: 14px 16px;
+  background-color: #020617; /* bg-slate-950 */
+  border-bottom: 1px solid #1e293b;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: move;
+  flex-shrink: 0;
+}
+
+.vi-header-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.vi-header-title span {
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: -0.025em;
+  color: #e2e8f0;
+}
+
+.vi-close-btn {
+  padding: 4px;
+  color: #94a3b8;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s, color 0.15s;
+}
+.vi-close-btn:hover {
+  color: #ffffff;
+  background-color: #1e293b;
+}
+
+/* Layout das Duas Colunas */
+.vi-container {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+  background-color: rgba(15, 23, 42, 0.5);
+}
+
+/* Coluna de Controles (Esquerda) */
+.vi-controls-col {
+  flex: 1;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+}
+
+/* Botão de Mira */
+.vi-inspect-btn {
+  width: 100%;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  border: 1px solid transparent;
+  flex-shrink: 0;
+}
+.vi-inspect-btn.active {
+  background-color: #10b981;
+  color: #ffffff;
+  border-color: #059669;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+.vi-inspect-btn.inactive {
+  background-color: #1e293b;
+  color: #e2e8f0;
+  border-color: #334155;
+}
+.vi-inspect-btn.inactive:hover {
+  background-color: #334155;
+  color: #ffffff;
+}
+.vi-inspect-btn:active {
+  transform: scale(0.98);
+}
+
+/* Card de Elemento Selecionado */
+.vi-element-card {
+  background-color: rgba(2, 6, 23, 0.8);
+  border: 1px solid #1e293b;
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.vi-element-card-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.vi-label-tag {
+  font-size: 9px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #64748b;
+}
+
+.vi-badge-tag {
+  padding: 2px 8px;
+  background-color: rgba(6, 78, 59, 0.5);
+  color: #34d399;
+  border: 1px solid rgba(4, 120, 87, 0.3);
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: bold;
+}
+
+.vi-parent-nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  background-color: rgba(30, 41, 59, 0.4);
+  border: 1px solid #334155;
+  border-radius: 6px;
+  color: #94a3b8;
+  font-size: 9px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  outline: none;
+}
+
+.vi-parent-nav-btn:hover {
+  color: #ffffff;
+  background-color: rgba(16, 185, 129, 0.15);
+  border-color: #10b981;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.2);
+}
+
+.vi-parent-nav-btn:active {
+  transform: scale(0.96);
+}
+
+.vi-classes-text {
+  font-size: 10px;
+  color: #94a3b8;
+  font-weight: 500;
+  word-break: break-all;
+  max-height: 48px;
+  overflow-y: auto;
+  line-height: 1.5;
+}
+
+/* Barra de Abas (Tabs) */
+.vi-tabs {
+  display: flex;
+  background-color: #020617;
+  border: 1px solid #1e293b;
+  padding: 4px;
+  border-radius: 12px;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.vi-tab-btn {
+  flex: 1;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 8px;
+  font-size: 10px;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  background: transparent;
+  color: #94a3b8;
+  font-weight: bold;
+}
+.vi-tab-btn.active {
+  background-color: #1e293b;
+  color: #34d399;
+  font-weight: 800;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.vi-tab-btn:hover:not(.active) {
+  color: #ffffff;
+  background-color: rgba(30, 41, 59, 0.5);
+}
+
+/* Seções de Controles */
+.vi-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.vi-section-title {
+  font-size: 9px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #64748b;
+}
+
+.vi-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Cards de Inputs */
+.vi-input-card {
+  background-color: #020617;
+  border: 1px solid #1e293b;
+  padding: 10px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+.vi-input-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.vi-input-label {
+  font-size: 10px;
+  font-weight: bold;
+  color: #cbd5e1;
+}
+
+.vi-input-sub {
+  font-size: 9px;
+  color: #475569;
+  font-weight: 500;
+}
+
+.vi-input-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.vi-reset-btn {
+  padding: 6px;
+  color: #64748b;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+.vi-reset-btn:hover {
+  color: #ffffff;
+  background-color: #1e293b;
+}
+
+/* Inputs de Cor */
+input[type="color"] {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid #334155;
+  cursor: pointer;
+  overflow: hidden;
+  background: transparent;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  outline: none;
+  padding: 0;
+  transition: all 0.15s;
+}
+input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+input[type="color"]::-webkit-color-swatch {
+  border: none;
+  border-radius: 50%;
+}
+input[type="color"].ring-active {
+  border-color: #10b981;
+  box-shadow: 0 0 0 2px #0f172a, 0 0 0 4px #10b981;
+}
+
+/* Container de Gradientes */
+.vi-gradient-box {
+  background-color: #020617;
+  border: 1px solid #1e293b;
+  padding: 12px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+.vi-divider {
+  border-top: 1px solid rgba(30, 41, 59, 0.6);
+  margin: 2px 0;
+}
+
+/* Bússola / Dial de Ângulo */
+.vi-compass-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background-color: rgba(15, 23, 42, 0.6);
+  padding: 10px;
+  border: 1px solid rgba(30, 41, 59, 0.8);
+  border-radius: 12px;
+}
+
+.vi-compass-dial {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px solid #334155;
+  background-color: #020617;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.15s;
+}
+.vi-compass-dial:hover {
+  border-color: #10b981;
+}
+
+.vi-compass-center {
+  width: 6px;
+  height: 6px;
+  background-color: #34d399;
+  border-radius: 50%;
+  z-index: 10;
+}
+
+.vi-compass-needle {
+  position: absolute;
+  width: 2px;
+  height: 22px;
+  background-color: #34d399;
+  bottom: 24px;
+  transform-origin: bottom center;
+  transition: transform 0.1s ease-out;
+}
+
+.vi-compass-dot {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background-color: #475569;
+  border-radius: 50%;
+}
+.vi-compass-dot.n { top: 2px; }
+.vi-compass-dot.s { bottom: 2px; }
+.vi-compass-dot.w { left: 2px; }
+.vi-compass-dot.e { right: 2px; }
+
+.vi-compass-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.vi-compass-stats {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 9px;
+  font-weight: bold;
+  color: #94a3b8;
+}
+
+.vi-compass-stats span.val {
+  color: #ffffff;
+  font-weight: 800;
+}
+
+/* Sliders */
+input[type="range"] {
+  width: 100%;
+  height: 4px;
+  background-color: #1e293b;
+  border-radius: 8px;
+  appearance: none;
+  cursor: pointer;
+  outline: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: #10b981;
+  transition: transform 0.1s;
+}
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+/* Sliders & Controles de Layout */
+.vi-layout-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background-color: #020617;
+  padding: 10px;
+  border: 1px solid #1e293b;
+  border-radius: 12px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+.vi-layout-value {
+  font-size: 10px;
+  font-weight: bold;
+  color: #cbd5e1;
+  width: 40px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* Borda Config Detail */
+.vi-border-detail-box {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.vi-border-subcard {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.vi-border-sublabel {
+  font-size: 10px;
+  font-weight: bold;
+  color: #cbd5e1;
+}
+
+.vi-border-inner-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background-color: rgba(15, 23, 42, 0.6);
+  padding: 10px;
+  border: 1px solid rgba(30, 41, 59, 0.8);
+  border-radius: 12px;
+}
+
+/* Seletor de Lados de Borda (Box-Model Interativo) */
+.vi-border-sides-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background-color: rgba(15, 23, 42, 0.6);
+  padding: 10px;
+  border: 1px solid rgba(30, 41, 59, 0.8);
+  border-radius: 12px;
+}
+
+/* Botão "Todas" */
+.vi-border-side-all-btn {
+  padding: 5px 10px;
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  background-color: #1e293b;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.vi-border-side-all-btn:hover {
+  color: #ffffff;
+  border-color: #10b981;
+  background-color: rgba(16, 185, 129, 0.1);
+}
+.vi-border-side-all-btn.active {
+  color: #10b981;
+  border-color: #10b981;
+  background-color: rgba(16, 185, 129, 0.15);
+  box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.3);
+}
+
+/* Grid Box-Model de 3x3 */
+.vi-border-box-model {
+  display: grid;
+  grid-template-columns: 24px 1fr 24px;
+  grid-template-rows: 24px 1fr 24px;
+  gap: 3px;
+  width: 80px;
+  height: 72px;
+  flex-shrink: 0;
+}
+
+/* Botões dos lados do Box-Model */
+.vi-border-side-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  font-weight: 900;
+  border-radius: 4px;
+  border: 1px solid #334155;
+  background-color: #1e293b;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  padding: 0;
+}
+.vi-border-side-btn:hover {
+  color: #ffffff;
+  border-color: #64748b;
+  background-color: #334155;
+}
+.vi-border-side-btn.active {
+  color: #10b981;
+  border-color: #10b981;
+  background-color: rgba(16, 185, 129, 0.15);
+  box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.25);
+}
+/* Posicionamento das bordas no grid */
+.vi-border-side-btn.top {
+  grid-column: 2;
+  grid-row: 1;
+}
+.vi-border-side-btn.bottom {
+  grid-column: 2;
+  grid-row: 3;
+}
+.vi-border-side-btn.left {
+  grid-column: 1;
+  grid-row: 2;
+}
+.vi-border-side-btn.right {
+  grid-column: 3;
+  grid-row: 2;
+}
+
+/* Célula Central do Box-Model */
+.vi-border-box-center {
+  grid-column: 2;
+  grid-row: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(2, 6, 23, 0.5);
+  border: 1px dashed #1e293b;
+  border-radius: 3px;
+}
+.vi-border-box-center span {
+  font-size: 7px;
+  font-weight: 900;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+/* Botão Reset Geral */
+.vi-reset-all-btn {
+  width: 100%;
+  margin-top: auto;
+  padding: 8px 16px;
+  background-color: #1e293b;
+  border: 1px solid #334155;
+  color: #cbd5e1;
+  font-weight: 800;
+  font-size: 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  flex-shrink: 0;
+}
+.vi-reset-all-btn:hover {
+  background-color: #334155;
+  color: #ffffff;
+}
+
+/* Coluna da Paleta (Direita) */
+.vi-palette-col {
+  width: 200px;
+  flex-shrink: 0;
+  border-left: 1px solid #1e293b;
+  background-color: rgba(2, 6, 23, 0.4);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+}
+
+.vi-palette-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.vi-palette-focus-badge {
+  font-size: 9px;
+  font-weight: bold;
+  color: #10b981;
+  background-color: rgba(6, 78, 59, 0.5);
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(4, 120, 87, 0.3);
+  text-align: center;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vi-palette-grid-box {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.vi-palette-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  background-color: #020617;
+  padding: 10px;
+  border: 1px solid #1e293b;
+  border-radius: 12px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+  max-h: 240px;
+  overflow-y: auto;
+}
+
+.vi-palette-color-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  border: 1px solid #1e293b;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  position: relative;
+  outline: none;
+  padding: 0;
+  transition: all 0.15s ease-in-out;
+}
+.vi-palette-color-btn:hover {
+  border-color: #ffffff;
+  transform: scale(1.05);
+}
+
+.vi-palette-color-indicator {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  left: 2px;
+  right: 2px;
+  border-radius: 4px;
+  border: 1px solid #ffffff;
+  background-color: rgba(2, 6, 23, 0.15);
+  mix-blend-mode: difference;
+}
+
+.vi-palette-tip {
+  font-size: 8.5px;
+  color: #64748b;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+/* Estado Vazio */
+.vi-empty-state {
+  padding: 32px 16px;
+  border: 1px dashed #334155;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 10px;
+  background-color: rgba(2, 6, 23, 0.15);
+  flex: 1;
+}
+
+.vi-empty-icon-box {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #1e293b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+}
+
+.vi-empty-text {
+  font-size: 10px;
+  color: #94a3b8;
+  font-weight: bold;
+  max-width: 180px;
+  line-height: 1.5;
+}
+
+/* Alça de Redimensionamento */
+.vi-resize-handle {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 16px;
+  height: 16px;
+  cursor: se-resize;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: 2px;
+  z-index: 999999;
+}
+
+.vi-resize-svg {
+  width: 10px;
+  height: 10px;
+  color: #475569;
+  transition: color 0.15s;
+}
+.vi-resize-handle:hover .vi-resize-svg {
+  color: #10b981;
+}
+
+/* Alternador do Switch Switch Container */
+.vi-switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.vi-switch-input {
+  display: none;
+}
+
+.vi-switch-slider {
+  width: 36px;
+  height: 20px;
+  background-color: #1e293b;
+  border-radius: 9999px;
+  position: relative;
+  transition: background-color 0.2s;
+}
+.vi-switch-slider::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background-color: #64748b;
+  border-radius: 50%;
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.vi-switch-input:checked + .vi-switch-slider {
+  background-color: #10b981;
+}
+.vi-switch-input:checked + .vi-switch-slider::after {
+  transform: translateX(16px);
+  background-color: #ffffff;
+}
+
+/* --- Novos Controles Sincronizados com a Extensão --- */
+
+/* Botões Segmentados (Ex: Geral / Lados) */
+.vi-segment-control {
+  display: flex;
+  background-color: #020617;
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  padding: 2px;
+}
+
+.vi-segment-btn {
+  padding: 3px 8px;
+  border: none;
+  border-radius: 6px;
+  font-size: 9px;
+  font-weight: 800;
+  background: transparent;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.vi-segment-btn:hover {
+  color: #cbd5e1;
+}
+
+.vi-segment-btn.active {
+  background-color: #1e293b;
+  color: #34d399;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Grids de Sliders Individuais (Lados / Cantos) */
+.vi-indiv-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background-color: #020617;
+  border: 1px solid #1e293b;
+  padding: 10px;
+  border-radius: 12px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+.vi-indiv-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.vi-indiv-label {
+  font-size: 10px;
+  font-weight: bold;
+  color: #94a3b8;
+  width: 65px;
+  flex-shrink: 0;
+}
+
+.vi-indiv-value {
+  font-size: 10px;
+  font-weight: bold;
+  color: #cbd5e1;
+  width: 35px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* Grid de Tipografia (2 colunas) */
+.vi-typo-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* Botões Agrupados (Ex: Alinhamentos, Direção Flexbox) */
+.vi-btn-group {
+  display: flex;
+  background-color: #020617;
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  padding: 2px;
+  width: 100%;
+}
+
+.vi-btn-group-btn {
+  flex: 1;
+  padding: 6px;
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  font-size: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vi-btn-group-btn:not(:last-child) {
+  border-right: 1px solid rgba(30, 41, 59, 0.4);
+}
+
+.vi-btn-group-btn:hover {
+  color: #ffffff;
+  background-color: rgba(30, 41, 59, 0.3);
+}
+
+.vi-btn-group-btn.active {
+  background-color: #1e293b;
+  color: #34d399;
+  border-radius: 6px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Comboboxes Estilizados */
+.vi-select {
+  width: 100%;
+  padding: 8px 12px;
+  background-color: #020617;
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  color: #cbd5e1;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.15s ease-in-out;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 12px;
+  padding-right: 28px;
+}
+
+.vi-select:hover {
+  border-color: #334155;
+  color: #ffffff;
+}
+
+.vi-select:focus {
+  border-color: #10b981;
+  box-shadow: 0 0 0 1px #10b981;
+}

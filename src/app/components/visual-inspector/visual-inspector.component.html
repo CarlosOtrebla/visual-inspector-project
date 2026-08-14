@@ -1,0 +1,618 @@
+<div *ngIf="isOpen" [style.top.px]="y" [style.left.px]="x" [style.width.px]="width" [style.height.px]="height"
+  class="vi-panel">
+  <!-- Cabeçalho (Área de Arrasto) -->
+  <div (mousedown)="onMouseDownHeader($event)" class="vi-header">
+    <div class="vi-header-title">
+      <lucide-icon name="palette" class="w-4 h-4 text-emerald-450"
+        style="color: #34d399; width: 16px; height: 16px;"></lucide-icon>
+      <span>Visual Inspector Otrebla'S</span>
+    </div>
+    <button (click)="closeInspector()" class="vi-close-btn">
+      <lucide-icon name="x" class="w-3.5 h-3.5" style="width: 14px; height: 14px;"></lucide-icon>
+    </button>
+  </div>
+
+  <!-- Corpo do Painel (Duas colunas: Controles à esquerda, Paleta à direita) -->
+  <div class="vi-container">
+
+    <!-- Coluna Esquerda: Controles de Estilização -->
+    <div class="vi-controls-col no-scrollbar">
+      <!-- Ativação do Modo Mira -->
+      <button (click)="toggleInspectMode()" [class.active]="inspectMode" [class.inactive]="!inspectMode"
+        class="vi-inspect-btn">
+        <lucide-icon name="target" [class.animate-spin]="inspectMode" class="w-4 h-4"
+          style="width: 16px; height: 16px;"></lucide-icon>
+        <span>{{ inspectMode ? 'Mira Ativa (Clique no Componente)' : 'Ativar Mira de Seleção' }}</span>
+      </button>
+
+      <!-- Estado de Seleção -->
+      <div *ngIf="selectedElement; else emptyState" style="display: flex; flex-direction: column; gap: 16px; flex: 1;">
+
+        <!-- Info do Elemento -->
+        <div class="vi-element-card">
+          <div class="vi-element-card-row">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span class="vi-label-tag">Elemento</span>
+              <span class="vi-badge-tag">&lt;{{ tagName }}&gt;</span>
+            </div>
+            <div style="display: flex; gap: 4px;">
+              <button *ngIf="hasEligibleChild" (click)="selectChildElement()" class="vi-parent-nav-btn"
+                title="Voltar para o elemento filho &lt;{{ childTagName }}&gt;">
+                <lucide-icon name="chevron-down" class="w-3.5 h-3.5" style="width: 14px; height: 14px;"></lucide-icon>
+                <span>Filho: &lt;{{ childTagName }}&gt;</span>
+              </button>
+              <button *ngIf="hasEligibleParent" (click)="selectParentElement()" class="vi-parent-nav-btn"
+                title="Selecionar elemento pai &lt;{{ parentTagName }}&gt;">
+                <lucide-icon name="chevron-up" class="w-3.5 h-3.5" style="width: 14px; height: 14px;"></lucide-icon>
+                <span>Pai: &lt;{{ parentTagName }}&gt;</span>
+              </button>
+            </div>
+          </div>
+          <p class="vi-classes-text no-scrollbar">
+            {{ classList }}
+          </p>
+        </div>
+
+        <!-- Barra de Abas (Tabs) -->
+        <div class="vi-tabs">
+          <button (click)="activeTab = 'colors'" [class.active]="activeTab === 'colors'" class="vi-tab-btn">
+            Cores & Fundo
+          </button>
+          <button (click)="activeTab = 'layout'" [class.active]="activeTab === 'layout'" class="vi-tab-btn">
+            Espaço & Borda
+          </button>
+        </div>
+
+        <!-- Conteúdo da Aba 1: Cores & Fundo -->
+        <div *ngIf="activeTab === 'colors'" style="display: flex; flex-direction: column; gap: 16px;">
+          <!-- Seção: Estilo de Fundo -->
+          <div class="vi-section">
+            <h4 class="vi-section-title">Estilo de Fundo</h4>
+
+            <!-- Alternador de Modo Gradiente -->
+            <div class="vi-input-card">
+              <span class="vi-input-label">Usar Gradiente de Fundo</span>
+              <label class="vi-switch">
+                <input type="checkbox" [checked]="useGradientMode" (change)="toggleGradientMode()"
+                  class="vi-switch-input">
+                <div class="vi-switch-slider"></div>
+              </label>
+            </div>
+
+            <!-- Seletor Simples (Sólido) -->
+            <div *ngIf="!useGradientMode" class="vi-input-card">
+              <div class="vi-input-info">
+                <span class="vi-input-label">Cor de Fundo Sólida</span>
+                <span class="vi-input-sub">{{ tempBgColor | uppercase }}</span>
+              </div>
+              <div class="vi-input-controls">
+                <button (click)="resetBgColor()" class="vi-reset-btn" title="Resetar Fundo">
+                  <lucide-icon name="rotate-ccw" class="w-3.5 h-3.5" style="width: 14px; height: 14px;"></lucide-icon>
+                </button>
+                <input type="color" [value]="tempBgColor" (input)="updateBgColor($event)" (click)="setActiveField('bg')"
+                  [class.ring-active]="activeColorField === 'bg'" />
+              </div>
+            </div>
+
+            <!-- Seletores de Gradiente -->
+            <div *ngIf="useGradientMode" class="vi-gradient-box">
+              <!-- Cor Inicial -->
+              <div class="vi-element-card-row">
+                <div class="vi-input-info">
+                  <span class="vi-input-label">Cor Inicial</span>
+                  <span class="vi-input-sub">{{ gradientStartColor | uppercase }}</span>
+                </div>
+                <div class="vi-input-controls">
+                  <button (click)="resetGradientStartColor()" class="vi-reset-btn" title="Resetar Cor Inicial">
+                    <lucide-icon name="rotate-ccw" class="w-3.5 h-3.5" style="width: 14px; height: 14px;"></lucide-icon>
+                  </button>
+                  <input type="color" [value]="gradientStartColor" (input)="updateGradientStart($event)"
+                    (click)="setActiveField('gradientStart')"
+                    [class.ring-active]="activeColorField === 'gradientStart'" />
+                </div>
+              </div>
+
+              <!-- Divisor Interno -->
+              <div class="vi-divider"></div>
+
+              <!-- Cor Final -->
+              <div class="vi-element-card-row">
+                <div class="vi-input-info">
+                  <span class="vi-input-label">Cor Final</span>
+                  <span class="vi-input-sub">{{ gradientEndColor | uppercase }}</span>
+                </div>
+                <div class="vi-input-controls">
+                  <button (click)="resetGradientEndColor()" class="vi-reset-btn" title="Resetar Cor Final">
+                    <lucide-icon name="rotate-ccw" class="w-3.5 h-3.5" style="width: 14px; height: 14px;"></lucide-icon>
+                  </button>
+                  <input type="color" [value]="gradientEndColor" (input)="updateGradientEnd($event)"
+                    (click)="setActiveField('gradientEnd')" [class.ring-active]="activeColorField === 'gradientEnd'" />
+                </div>
+              </div>
+
+              <!-- Divisor Interno -->
+              <div class="vi-divider"></div>
+
+              <!-- Mostrador/Dial Circular de Direção -->
+              <div class="vi-section" style="gap: 6px;">
+                <span class="vi-input-label">Direção do Gradiente (Bússola)</span>
+                <div class="vi-compass-row">
+                  <!-- Círculo Interativo -->
+                  <div (click)="onAngleDialClick($event)" class="vi-compass-dial"
+                    title="Clique na borda para apontar a direção">
+                    <!-- Centro -->
+                    <div class="vi-compass-center"></div>
+                    <!-- Ponteiro -->
+                    <div class="vi-compass-needle" [style.transform]="'rotate(' + gradientAngle + 'deg)'"></div>
+                    <!-- Marcações Cardinais -->
+                    <div class="vi-compass-dot n"></div>
+                    <div class="vi-compass-dot s"></div>
+                    <div class="vi-compass-dot w"></div>
+                    <div class="vi-compass-dot e"></div>
+                  </div>
+
+                  <!-- Ajuste de Precisão -->
+                  <div class="vi-compass-controls">
+                    <div class="vi-compass-stats">
+                      <span>Ângulo</span>
+                      <span class="val">{{ gradientAngle }}°</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px; width: 100%;">
+                      <button (click)="resetGradientAngle()" class="vi-reset-btn" title="Resetar Ângulo do Gradiente">
+                        <lucide-icon name="rotate-ccw" class="w-3.5 h-3.5"
+                          style="width: 14px; height: 14px;"></lucide-icon>
+                      </button>
+                      <input type="range" min="0" max="360" [ngModel]="gradientAngle"
+                        (input)="onAngleSliderChange($event)" style="flex: 1;" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cor do Texto -->
+          <div class="vi-section">
+            <h4 class="vi-section-title">Tipografia</h4>
+            <div class="vi-input-card">
+              <div class="vi-input-info">
+                <span class="vi-input-label">Cor do Texto</span>
+                <span class="vi-input-sub">{{ tempTextColor | uppercase }}</span>
+              </div>
+              <div class="vi-input-controls">
+                <button (click)="resetTextColor()" class="vi-reset-btn" title="Resetar Texto">
+                  <lucide-icon name="rotate-ccw" class="w-3.5 h-3.5" style="width: 14px; height: 14px;"></lucide-icon>
+                </button>
+                <input type="color" [value]="tempTextColor" (input)="updateTextColor($event)"
+                  (click)="setActiveField('text')" [class.ring-active]="activeColorField === 'text'" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Tipografia Avançada -->
+          <div class="vi-section">
+            <div class="vi-section-header">
+              <h4 class="vi-section-title">Estilos de Texto</h4>
+              <button (click)="resetTypo()" class="vi-reset-btn" title="Resetar Tipografia">
+                <lucide-icon name="rotate-ccw" class="w-3.5 h-3.5" style="width: 14px; height: 14px;"></lucide-icon>
+              </button>
+            </div>
+            
+            <div class="vi-typo-grid" style="margin-bottom: 8px;">
+              <div>
+                <span class="vi-input-label" style="display:block; margin-bottom: 4px;">Peso (Weight)</span>
+                <select [ngModel]="fontWeight" (change)="updateFontWeight($event)" class="vi-select">
+                  <option value="100">100 (Thin)</option>
+                  <option value="200">200 (Extra Light)</option>
+                  <option value="300">300 (Light)</option>
+                  <option value="400">400 (Normal)</option>
+                  <option value="500">500 (Medium)</option>
+                  <option value="600">600 (Semi Bold)</option>
+                  <option value="700">700 (Bold)</option>
+                  <option value="800">800 (Extra Bold)</option>
+                  <option value="900">900 (Black)</option>
+                </select>
+              </div>
+              <div>
+                <span class="vi-input-label" style="display:block; margin-bottom: 4px;">Caixa (Transform)</span>
+                <select [ngModel]="textTransform" (change)="updateTextTransform($event)" class="vi-select">
+                  <option value="none">Nenhum</option>
+                  <option value="uppercase">MAIÚSCULO</option>
+                  <option value="lowercase">minúsculo</option>
+                  <option value="capitalize">Capitalizado</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="margin-bottom: 8px;">
+              <span class="vi-input-label" style="display:block; margin-bottom: 4px;">Tamanho da Fonte</span>
+              <div class="vi-layout-card">
+                <input type="range" min="8" max="72" [ngModel]="fontSize" (input)="updateFontSize($event)" />
+                <span class="vi-layout-value">{{ fontSize }}px</span>
+              </div>
+            </div>
+
+            <div class="vi-typo-grid" style="margin-bottom: 8px;">
+              <div>
+                <span class="vi-input-label" style="display:block; margin-bottom: 4px;">Altura da Linha</span>
+                <div class="vi-layout-card">
+                  <input type="range" min="1" max="3" step="0.1" [ngModel]="lineHeight" (input)="updateLineHeight($event)" />
+                  <span class="vi-layout-value">{{ lineHeight }}</span>
+                </div>
+              </div>
+              <div>
+                <span class="vi-input-label" style="display:block; margin-bottom: 4px;">Espaço Letras</span>
+                <div class="vi-layout-card">
+                  <input type="range" min="-2" max="10" step="0.5" [ngModel]="letterSpacing" (input)="updateLetterSpacing($event)" />
+                  <span class="vi-layout-value">{{ letterSpacing }}px</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="vi-typo-grid">
+              <div>
+                <span class="vi-input-label" style="display:block; margin-bottom: 4px;">Alinhamento</span>
+                <div class="vi-btn-group">
+                  <button (click)="setTextAlign('left')" [class.active]="textAlign === 'left'" class="vi-btn-group-btn" title="Esquerda">L</button>
+                  <button (click)="setTextAlign('center')" [class.active]="textAlign === 'center'" class="vi-btn-group-btn" title="Centralizado">C</button>
+                  <button (click)="setTextAlign('right')" [class.active]="textAlign === 'right'" class="vi-btn-group-btn" title="Direita">R</button>
+                  <button (click)="setTextAlign('justify')" [class.active]="textAlign === 'justify'" class="vi-btn-group-btn" title="Justificado">J</button>
+                </div>
+              </div>
+              <div>
+                <span class="vi-input-label" style="display:block; margin-bottom: 4px;">Estilos</span>
+                <div class="vi-btn-group">
+                  <button (click)="toggleStyleBold()" [class.active]="fontStyleBoldActive" class="vi-btn-group-btn" title="Negrito" style="font-weight: bold;">B</button>
+                  <button (click)="toggleStyleItalic()" [class.active]="fontStyle.includes('italic')" class="vi-btn-group-btn" title="Itálico" style="font-style: italic;">I</button>
+                  <button (click)="toggleStyleUnderline()" [class.active]="textDecoration.includes('underline')" class="vi-btn-group-btn" title="Sublinhado" style="text-decoration: underline;">U</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Conteúdo da Aba 2: Espaço & Borda -->
+        <div *ngIf="activeTab === 'layout'" style="display: flex; flex-direction: column; gap: 16px;">
+          <!-- Seção 1: Layout & Display -->
+          <div class="vi-section">
+            <div class="vi-section-header">
+              <h4 class="vi-section-title">Layout & Display</h4>
+              <button (click)="resetDisplayLayout()" class="vi-reset-btn" title="Resetar Layout">
+                <lucide-icon name="rotate-ccw" class="w-3.5 h-3.5" style="width: 14px; height: 14px;"></lucide-icon>
+              </button>
+            </div>
+            
+            <div style="margin-bottom: 8px;">
+              <span class="vi-input-label" style="display:block; margin-bottom: 4px;">Modo de Exibição (Display)</span>
+              <select [ngModel]="display" (change)="updateDisplay($event)" class="vi-select">
+                <option value="block">block (Bloco)</option>
+                <option value="flex">flex (Flexbox)</option>
+                <option value="inline-block">inline-block</option>
+                <option value="none">none (Oculto)</option>
+              </select>
+            </div>
+
+            <!-- Subpainel Flexbox (Oculto por padrão se display !== 'flex') -->
+            <div *ngIf="display === 'flex'" style="display: flex; flex-direction: column; gap: 8px; border-left: 2px solid #10b981; padding-left: 8px; margin-top: 8px;">
+              <div class="vi-typo-grid">
+                <div>
+                  <span class="vi-input-label" style="display:block; margin-bottom: 4px;">Direção</span>
+                  <div class="vi-btn-group">
+                    <button (click)="setFlexDirection('row')" [class.active]="flexDirection === 'row'" class="vi-btn-group-btn">Linha</button>
+                    <button (click)="setFlexDirection('column')" [class.active]="flexDirection === 'column'" class="vi-btn-group-btn">Coluna</button>
+                  </div>
+                </div>
+                <div>
+                  <span class="vi-input-label" style="display:block; margin-bottom: 4px;">Quebra (Wrap)</span>
+                  <select [ngModel]="flexWrap" (change)="updateFlexWrap($event)" class="vi-select">
+                    <option value="nowrap">Sem Quebra</option>
+                    <option value="wrap">Com Quebra</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style="margin-bottom: 4px;">
+                <span class="vi-input-label" style="display:block; margin-bottom: 4px;">Espaçamento (Gap)</span>
+                <div class="vi-layout-card">
+                  <input type="range" min="0" max="48" [ngModel]="flexGap" (input)="updateFlexGap($event)" />
+                  <span class="vi-layout-value">{{ flexGap }}px</span>
+                </div>
+              </div>
+
+              <div class="vi-typo-grid">
+                <div>
+                  <span class="vi-input-label" style="display:block; margin-bottom: 4px;">Justificar</span>
+                  <select [ngModel]="justifyContent" (change)="updateFlexJustify($event)" class="vi-select">
+                    <option value="flex-start">Início</option>
+                    <option value="center">Centro</option>
+                    <option value="flex-end">Fim</option>
+                    <option value="space-between">Espaço Entre</option>
+                    <option value="space-around">Espaço Em Volta</option>
+                  </select>
+                </div>
+                <div>
+                  <span class="vi-input-label" style="display:block; margin-bottom: 4px;">Alinhar Itens</span>
+                  <select [ngModel]="alignItems" (change)="updateFlexAlign($event)" class="vi-select">
+                    <option value="stretch">Esticar</option>
+                    <option value="flex-start">Início</option>
+                    <option value="center">Centro</option>
+                    <option value="flex-end">Fim</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Seção 2: Margem Externa -->
+          <div class="vi-section">
+            <div class="vi-section-header">
+              <h4 class="vi-section-title">Margem Externa</h4>
+              <div class="vi-segment-control">
+                <button (click)="marginMode = 'all'" [class.active]="marginMode === 'all'" class="vi-segment-btn">Geral</button>
+                <button (click)="marginMode = 'indiv'" [class.active]="marginMode === 'indiv'" class="vi-segment-btn">Lados</button>
+              </div>
+            </div>
+            
+            <!-- Geral -->
+            <div *ngIf="marginMode === 'all'" class="vi-layout-card">
+              <input type="range" min="0" max="48" [ngModel]="margin" (input)="updateMargin($event)" />
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <button (click)="resetMargin()" class="vi-reset-btn" title="Resetar Margem Geral">
+                  <lucide-icon name="rotate-ccw" class="w-3.5 h-3.5" style="width: 14px; height: 14px;"></lucide-icon>
+                </button>
+                <span class="vi-layout-value">{{ margin }}px</span>
+              </div>
+            </div>
+
+            <!-- Individual -->
+            <div *ngIf="marginMode === 'indiv'" class="vi-indiv-grid">
+              <div class="vi-indiv-row">
+                <span class="vi-indiv-label">↑ Topo</span>
+                <input type="range" min="0" max="48" [ngModel]="marginTop" (input)="updateMarginSide('top', $event)" />
+                <span class="vi-indiv-value">{{ marginTop }}px</span>
+              </div>
+              <div class="vi-indiv-row">
+                <span class="vi-indiv-label">→ Direita</span>
+                <input type="range" min="0" max="48" [ngModel]="marginRight" (input)="updateMarginSide('right', $event)" />
+                <span class="vi-indiv-value">{{ marginRight }}px</span>
+              </div>
+              <div class="vi-indiv-row">
+                <span class="vi-indiv-label">↓ Base</span>
+                <input type="range" min="0" max="48" [ngModel]="marginBottom" (input)="updateMarginSide('bottom', $event)" />
+                <span class="vi-indiv-value">{{ marginBottom }}px</span>
+              </div>
+              <div class="vi-indiv-row">
+                <span class="vi-indiv-label">← Esquerda</span>
+                <input type="range" min="0" max="48" [ngModel]="marginLeft" (input)="updateMarginSide('left', $event)" />
+                <span class="vi-indiv-value">{{ marginLeft }}px</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Seção 3: Padding -->
+          <div class="vi-section">
+            <div class="vi-section-header">
+              <h4 class="vi-section-title">Espaço Interno (Padding)</h4>
+              <div class="vi-segment-control">
+                <button (click)="paddingMode = 'all'" [class.active]="paddingMode === 'all'" class="vi-segment-btn">Geral</button>
+                <button (click)="paddingMode = 'indiv'" [class.active]="paddingMode === 'indiv'" class="vi-segment-btn">Lados</button>
+              </div>
+            </div>
+            
+            <!-- Geral -->
+            <div *ngIf="paddingMode === 'all'" class="vi-layout-card">
+              <input type="range" min="0" max="48" [ngModel]="padding" (input)="updatePadding($event)" />
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <button (click)="resetPadding()" class="vi-reset-btn" title="Resetar Padding Geral">
+                  <lucide-icon name="rotate-ccw" class="w-3.5 h-3.5" style="width: 14px; height: 14px;"></lucide-icon>
+                </button>
+                <span class="vi-layout-value">{{ padding }}px</span>
+              </div>
+            </div>
+
+            <!-- Individual -->
+            <div *ngIf="paddingMode === 'indiv'" class="vi-indiv-grid">
+              <div class="vi-indiv-row">
+                <span class="vi-indiv-label">↑ Topo</span>
+                <input type="range" min="0" max="48" [ngModel]="paddingTop" (input)="updatePaddingSide('top', $event)" />
+                <span class="vi-indiv-value">{{ paddingTop }}px</span>
+              </div>
+              <div class="vi-indiv-row">
+                <span class="vi-indiv-label">→ Direita</span>
+                <input type="range" min="0" max="48" [ngModel]="paddingRight" (input)="updatePaddingSide('right', $event)" />
+                <span class="vi-indiv-value">{{ paddingRight }}px</span>
+              </div>
+              <div class="vi-indiv-row">
+                <span class="vi-indiv-label">↓ Base</span>
+                <input type="range" min="0" max="48" [ngModel]="paddingBottom" (input)="updatePaddingSide('bottom', $event)" />
+                <span class="vi-indiv-value">{{ paddingBottom }}px</span>
+              </div>
+              <div class="vi-indiv-row">
+                <span class="vi-indiv-label">← Esquerda</span>
+                <input type="range" min="0" max="48" [ngModel]="paddingLeft" (input)="updatePaddingSide('left', $event)" />
+                <span class="vi-indiv-value">{{ paddingLeft }}px</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Seção 4: Borda e Radius -->
+          <div class="vi-section">
+            <div class="vi-section-header">
+              <h4 class="vi-section-title">Borda & Contorno</h4>
+              <button (click)="resetBorderLayout()" class="vi-reset-btn" title="Resetar Borda">
+                <lucide-icon name="rotate-ccw" class="w-3.5 h-3.5" style="width: 14px; height: 14px;"></lucide-icon>
+              </button>
+            </div>
+
+            <div class="vi-gradient-box">
+              <div class="vi-typo-grid" style="margin-bottom: 8px;">
+                <div>
+                  <span class="vi-input-label" style="display:block; margin-bottom: 4px;">Estilo Borda</span>
+                  <select [ngModel]="borderStyle" (change)="updateBorderStyleSelect($event)" class="vi-select">
+                    <option value="none">Nenhum</option>
+                    <option value="solid">Sólido</option>
+                    <option value="dashed">Tracejado</option>
+                    <option value="dotted">Pontilhado</option>
+                    <option value="double">Duplo</option>
+                  </select>
+                </div>
+                <div>
+                  <span class="vi-input-label" style="display:block; margin-bottom: 4px;">Cor da Borda</span>
+                  <div class="vi-input-card" style="padding: 4px 10px; background-color: rgba(15, 23, 42, 0.6); border-color: rgba(30, 41, 59, 0.8);">
+                    <span class="vi-input-sub">{{ tempBorderColor | uppercase }}</span>
+                    <input type="color" [value]="tempBorderColor" (input)="updateBorderColor($event)" (click)="setActiveField('border')" [class.ring-active]="activeColorField === 'border'" style="width: 24px; height: 24px;" />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Largura da Borda -->
+              <div *ngIf="borderStyle !== 'none'" style="margin-bottom: 8px;">
+                <div class="vi-section-header" style="margin-bottom: 4px;">
+                  <span class="vi-input-label">Largura da Borda</span>
+                  <div class="vi-segment-control">
+                    <button (click)="borderWidthMode = 'all'" [class.active]="borderWidthMode === 'all'" class="vi-segment-btn">Geral</button>
+                    <button (click)="borderWidthMode = 'indiv'" [class.active]="borderWidthMode === 'indiv'" class="vi-segment-btn">Lados</button>
+                  </div>
+                </div>
+
+                <!-- Geral -->
+                <div *ngIf="borderWidthMode === 'all'" class="vi-layout-card">
+                  <input type="range" min="0" max="12" [ngModel]="borderWidth" (input)="updateBorderWidth($event)" />
+                  <span class="vi-layout-value">{{ borderWidth }}px</span>
+                </div>
+
+                <!-- Individual -->
+                <div *ngIf="borderWidthMode === 'indiv'" class="vi-indiv-grid">
+                  <div class="vi-indiv-row">
+                    <span class="vi-indiv-label">↑ Topo</span>
+                    <input type="range" min="0" max="12" [ngModel]="borderTopWidth" (input)="updateBorderSideWidth('top', $event)" />
+                    <span class="vi-indiv-value">{{ borderTopWidth }}px</span>
+                  </div>
+                  <div class="vi-indiv-row">
+                    <span class="vi-indiv-label">→ Direita</span>
+                    <input type="range" min="0" max="12" [ngModel]="borderRightWidth" (input)="updateBorderSideWidth('right', $event)" />
+                    <span class="vi-indiv-value">{{ borderRightWidth }}px</span>
+                  </div>
+                  <div class="vi-indiv-row">
+                    <span class="vi-indiv-label">↓ Base</span>
+                    <input type="range" min="0" max="12" [ngModel]="borderBottomWidth" (input)="updateBorderSideWidth('bottom', $event)" />
+                    <span class="vi-indiv-value">{{ borderBottomWidth }}px</span>
+                  </div>
+                  <div class="vi-indiv-row">
+                    <span class="vi-indiv-label">← Esquerda</span>
+                    <input type="range" min="0" max="12" [ngModel]="borderLeftWidth" (input)="updateBorderSideWidth('left', $event)" />
+                    <span class="vi-indiv-value">{{ borderLeftWidth }}px</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Radius / Canto Arredondado -->
+              <div>
+                <div class="vi-section-header" style="margin-bottom: 4px;">
+                  <span class="vi-input-label">Canto Arredondado (Radius)</span>
+                  <div class="vi-segment-control">
+                    <button (click)="radiusMode = 'all'" [class.active]="radiusMode === 'all'" class="vi-segment-btn">Geral</button>
+                    <button (click)="radiusMode = 'indiv'" [class.active]="radiusMode === 'indiv'" class="vi-segment-btn">Cantos</button>
+                  </div>
+                </div>
+
+                <!-- Geral -->
+                <div *ngIf="radiusMode === 'all'" class="vi-layout-card">
+                  <input type="range" min="0" max="48" [ngModel]="borderRadius" (input)="updateRadius($event)" />
+                  <span class="vi-layout-value">{{ borderRadius }}px</span>
+                </div>
+
+                <!-- Individual -->
+                <div *ngIf="radiusMode === 'indiv'" class="vi-indiv-grid">
+                  <div class="vi-indiv-row">
+                    <span class="vi-indiv-label">◤ Sup. Esq</span>
+                    <input type="range" min="0" max="48" [ngModel]="borderTopLeftRadius" (input)="updateRadiusSide('tl', $event)" />
+                    <span class="vi-indiv-value">{{ borderTopLeftRadius }}px</span>
+                  </div>
+                  <div class="vi-indiv-row">
+                    <span class="vi-indiv-label">◥ Sup. Dir</span>
+                    <input type="range" min="0" max="48" [ngModel]="borderTopRightRadius" (input)="updateRadiusSide('tr', $event)" />
+                    <span class="vi-indiv-value">{{ borderTopRightRadius }}px</span>
+                  </div>
+                  <div class="vi-indiv-row">
+                    <span class="vi-indiv-label">◢ Inf. Dir</span>
+                    <input type="range" min="0" max="48" [ngModel]="borderBottomRightRadius" (input)="updateRadiusSide('br', $event)" />
+                    <span class="vi-indiv-value">{{ borderBottomRightRadius }}px</span>
+                  </div>
+                  <div class="vi-indiv-row">
+                    <span class="vi-indiv-label">◣ Inf. Esq</span>
+                    <input type="range" min="0" max="48" [ngModel]="borderBottomLeftRadius" (input)="updateRadiusSide('bl', $event)" />
+                    <span class="vi-indiv-value">{{ borderBottomLeftRadius }}px</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ações do Inspetor -->
+        <div style="display: flex; gap: 8px; margin-top: auto;">
+          <button (click)="resetStyles()" class="vi-reset-all-btn" style="flex: 1; margin: 0;">
+            Limpar Tudo
+          </button>
+          <button (click)="applyChangesToSource()" [disabled]="isApplying" class="vi-apply-btn"
+            style="flex: 1; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 12px; font-weight: bold; color: white; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.2); transition: all 0.2s;">
+            <lucide-icon *ngIf="!isApplying" name="check" class="w-4 h-4"
+              style="width: 16px; height: 16px;"></lucide-icon>
+            <lucide-icon *ngIf="isApplying" name="loader" class="w-4 h-4 animate-spin"
+              style="width: 16px; height: 16px;"></lucide-icon>
+            {{ isApplying ? 'Enviando...' : 'Aplicar no Código' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Template Vazio -->
+      <ng-template #emptyState>
+        <div class="vi-empty-state">
+          <div class="vi-empty-icon-box">
+            <lucide-icon name="target" class="w-5 h-5" style="width: 20px; height: 20px;"></lucide-icon>
+          </div>
+          <p class="vi-empty-text">
+            Clique no botão de mira e selecione um elemento na tela para personalizar suas cores e layout.
+          </p>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Coluna Direita: Paleta de Cores em Uso no Sistema -->
+    <div *ngIf="selectedElement" class="vi-palette-col no-scrollbar">
+      <div class="vi-palette-header">
+        <h4 class="vi-section-title">Cores em Uso</h4>
+        <span class="vi-palette-focus-badge">
+          Foco: {{ getActiveFieldName() }}
+        </span>
+      </div>
+
+      <!-- Grade de Cores da Paleta -->
+      <div class="vi-palette-grid-box">
+        <div class="vi-palette-grid no-scrollbar">
+          <button *ngFor="let color of systemColors" (click)="applyPaletteColor(color)" class="vi-palette-color-btn"
+            [style.backgroundColor]="color" [title]="color">
+            <!-- Indicador de cor igual à cor do campo ativo -->
+            <div
+              *ngIf="color.toUpperCase() === (activeColorField === 'bg' ? tempBgColor.toUpperCase() : activeColorField === 'gradientStart' ? gradientStartColor.toUpperCase() : activeColorField === 'gradientEnd' ? gradientEndColor.toUpperCase() : activeColorField === 'text' ? tempTextColor.toUpperCase() : tempBorderColor.toUpperCase())"
+              class="vi-palette-color-indicator"></div>
+          </button>
+        </div>
+
+        <p class="vi-palette-tip">
+          💡 Clique em qualquer seletor redondo à esquerda para escolher a propriedade (Fundo, Texto, etc.), depois
+          selecione uma cor desta paleta para aplicar.
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Alça de Redimensionamento no Canto Inferior Direito -->
+  <div (mousedown)="onMouseDownResize($event)" class="vi-resize-handle" title="Arraste para redimensionar">
+    <svg class="vi-resize-svg" viewBox="0 0 10 10" fill="none">
+      <path d="M10 0 L0 10 M10 4 L4 10 M10 7 L7 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+    </svg>
+  </div>
+</div>

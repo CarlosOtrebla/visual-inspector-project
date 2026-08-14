@@ -1,0 +1,25 @@
+{
+  "tagName": "ASIDE",
+  "classList": "w-64 bg-slate-900 text-slate-350 p-6 flex flex-col gap-4 border-r border-slate-800",
+  "originalClasses": [
+    "w-64",
+    "bg-slate-900",
+    "text-slate-350",
+    "p-6",
+    "flex",
+    "flex-col",
+    "gap-4",
+    "border-r",
+    "border-slate-800"
+  ],
+  "modifiedStyles": {
+    "width": "240px",
+    "display": "flex",
+    "flex-direction": "column",
+    "row-gap": "16px",
+    "column-gap": "16px"
+  },
+  "outerHTML": "<aside _ngcontent-ng-c973631232=\"\" class=\"w-64 bg-slate-900 text-slate-350 p-6 flex flex-col gap-4 border-r border-slate-800\" style=\"width: 240px; display: flex; flex-direction: column; gap: 16px;\"><h3 _ngcontent-ng-c973631232=\"\" class=\"text-xs font-black uppercase tracking-wider text-slate-500\" style=\"font-size: 0.75rem; font-weight: 900; color: #64748b; letter-spacing: 0.1em; text-transform: uppercase;\">Componentes</h3><nav _ngcontent-ng-c973631232=\"\" class=\"flex flex-col gap-1.5\" style=\"display: flex; flex-direction: column; gap: 6px;\"><a _ngcontent-ng-c973631232=\"\" class=\"bg-slate-800 text-white px-3 py-2 rounded-lg text-sm font-semibold cursor-pointer\" style=\"background-color: #1e293b; color: white; padding: 8px 12px; border-radius: 8px; font-size: 0.875rem; font-weight: 600; cursor: pointer;\">Visão Geral</a><a _ngcontent-ng-c973631232=\"\" class=\"hover:bg-slate-850 hover:text-white px-3 py-2 rounded-lg text-sm font-medium transition cursor-pointer\" style=\"padding: 8px 12px; border-",
+  "selector": "aside.w-64.bg-slate-900.text-slate-350.p-6.flex.flex-col.gap-4.border-r.border-slate-800",
+  "timestamp": "2026-06-02T04:02:03.847Z"
+}
