@@ -1,4 +1,5 @@
 import { ApplicationConfig, importProvidersFrom, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { provideHttpClient } from '@angular/common/http';
 import { 
   LucideAngularModule,
   Palette,
@@ -13,6 +14,7 @@ import {
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
+    provideHttpClient(),
     importProvidersFrom(
       LucideAngularModule.pick({
         Palette,
